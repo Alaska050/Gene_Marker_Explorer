@@ -1,3 +1,10 @@
+"""
+Ensembl REST API connector.
+Provides functionality to retrieve structured gene level metadata
+from the Ensembl REST API using a gene symbol. The connector
+handles symbol to ID resolution and full metadata lookup.
+"""
+
 from typing import Any, Dict, Optional
 from dataclasses import dataclass
 import requests
