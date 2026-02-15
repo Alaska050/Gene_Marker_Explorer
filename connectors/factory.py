@@ -1,3 +1,8 @@
+"""
+Connector factory module.
+Provides a centralised way to create API connector instances.
+"""
+
 from typing import Dict, Type
 from .base import BaseConnector
 from .ensembl import EnsemblConnector
@@ -6,13 +11,12 @@ from .hpa import HPAConnector
 
 class ConnectorFactory:
     """
-    Factory for creating API connectors.
-
-    Implements the Factory pattern to decouple connector creation from usage.
-    Allows easy registration of new connector types without modifying client code.
+    Factory class responsible for creating connector instances.
+    Maintains a register of available connectors and
+    provides a consistent interface for instantiation.
     """
 
-    # Registry of available connectors
+    #  Registry mapping connector names to their corresponding classes.
     _connectors: Dict[str, Type[BaseConnector]] = {
         "ensembl": EnsemblConnector,
         "hpa": HPAConnector,
@@ -21,20 +25,11 @@ class ConnectorFactory:
     @classmethod
     def create(cls, connector_type: str, **kwargs) -> BaseConnector:
         """
-        Create a connector instance by type name.
-
-        Args:
-            connector_type: Name of the connector ('ensembl', 'hpa').
-            **kwargs: Additional arguments passed to connector constructor.
-
-        Returns:
-            Instance of the requested connector.
-
-        Raises:
-            ValueError: If connector type is not registered.
+        Create a connector instance by its registered name.
         """
         connector_type = connector_type.lower()
 
+        # Validate connector type before instantiation.
         if connector_type not in cls._connectors:
             available = ", ".join(cls._connectors.keys())
             raise ValueError(
@@ -48,14 +43,7 @@ class ConnectorFactory:
     @classmethod
     def register(cls, name: str, connector_class: Type[BaseConnector]) -> None:
         """
-        Register a new connector type.
-
-        Args:
-            name: Name to register the connector under.
-            connector_class: Connector class (must inherit from BaseConnector).
-
-        Raises:
-            TypeError: If connector_class doesn't inherit from BaseConnector.
+        Register a new connector class at runtime.
         """
         if not issubclass(connector_class, BaseConnector):
             raise TypeError(
@@ -67,15 +55,21 @@ class ConnectorFactory:
 
     @classmethod
     def available_connectors(cls) -> list:
-        """Return list of available connector type names."""
+        """
+        Return a list of registered connector names.
+        """
         return list(cls._connectors.keys())
 
     @classmethod
     def get_ensembl(cls, **kwargs) -> EnsemblConnector:
-        """Convenience method to create an Ensembl connector."""
+        """
+        Convenience method for creating an Ensembl connector.
+        """
         return cls.create("ensembl", **kwargs)
 
     @classmethod
     def get_hpa(cls, **kwargs) -> HPAConnector:
-        """Convenience method to create an HPA connector."""
+        """
+        Convenience method for creating an HPA connector.
+        """
         return cls.create("hpa", **kwargs)
