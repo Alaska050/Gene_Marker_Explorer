@@ -1,4 +1,10 @@
-import csv
+"""
+Service layer for gene exploration.
+Coordinates data retrieval from Ensembl (gene metadata)
+and the Human Protein Atlas (tissue expression),
+providing a unified interface for the CLI layer.
+"""
+
 from typing import Any, Dict, List, Optional
 
 from connectors.ensembl import GeneMetadata
@@ -8,18 +14,12 @@ from ..connectors.factory import ConnectorFactory
 
 class GeneService:
     """
-    Service layer that orchestrates the gene exploration pipeline.
-
-    Coordinates between Ensembl (gene metadata) and HPA (tissue expression)
-    to provide a unified interface for gene marker exploration.
+    Orchestrates the gene exploration workflow.
     """
 
     def __init__(self, timeout: int = 30):
         """
-        Initialize the GeneService.
-
-        Args:
-            timeout: Request timeout for API calls in seconds.
+         Initialise the service with a configurable request timeout.
         """
         self.timeout = timeout
         self._ensembl = None
@@ -27,27 +27,21 @@ class GeneService:
 
     @property
     def ensembl(self):
-        """Lazy-load Ensembl connector."""
+        """Initialise the Ensembl connector when first accessed."""
         if self._ensembl is None:
             self._ensembl = ConnectorFactory.get_ensembl(timeout=self.timeout)
         return self._ensembl
 
     @property
     def hpa(self):
-        """Lazy-load HPA connector."""
+        """Initialise the HPA connector when first accessed."""
         if self._hpa is None:
             self._hpa = ConnectorFactory.get_hpa(timeout=self.timeout)
         return self._hpa
 
     def get_gene_info(self, gene_symbol: str) -> GeneMetadata:
         """
-        Fetch gene metadata from Ensembl.
-
-        Args:
-            gene_symbol: Human gene symbol (e.g., 'CD3D').
-
-        Returns:
-            Dictionary containing gene metadata or None if not found.
+        Retrieve gene metadata from Ensembl.
         """
         return self.ensembl.get_gene_metadata(gene_symbol)
 
@@ -56,13 +50,7 @@ class GeneService:
             ensembl_id: str
     ) -> HPAGeneData:
         """
-        Fetch tissue expression data from Human Protein Atlas.
-
-        Args:
-            ensembl_id: Ensembl gene ID (e.g., 'ENSG00000167286').
-
-        Returns:
-            List of tissue expression dictionaries or None if not found.
+        Retrieve tissue expression data from the Human Protein Atlas.
         """
         return self.hpa.get_tissue_expression(ensembl_id)
 
@@ -74,26 +62,18 @@ class GeneService:
     ) -> List[Dict[str, Any]]:
         """
         Rank tissues by nTPM expression level.
-
-        Args:
-            expression_data: List of tissue expression dictionaries.
-            top_n: Number of top results to return (None for all).
-            ascending: If True, sort lowest to highest.
-
-        Returns:
-            Sorted list of tissue expression dictionaries.
         """
         if not expression_data:
             return []
 
-        # Sort by nTPM value
+        # Sort by expression value
         sorted_data = sorted(
             expression_data,
             key=lambda x: x.get("nTPM", 0),
             reverse=not ascending
         )
 
-        # Return top N if specified
+        # Return top N entries if specified
         if top_n is not None and top_n > 0:
             return sorted_data[:top_n]
 
@@ -105,31 +85,22 @@ class GeneService:
             top_n: int = 10
     ) -> Optional[Dict[str, Any]]:
         """
-        Complete gene exploration: fetch metadata and ranked expression.
-
-        This is the main orchestration method that runs the full pipeline:
-        1. Look up gene in Ensembl
-        2. Fetch tissue expression from HPA
+        Run the complete gene exploration workflow:
+        1. Fetch gene metadata from Ensembl
+        2. Retrieve tissue expression from HPA
         3. Rank tissues by expression level
-
-        Args:
-            gene_symbol: Human gene symbol (e.g., 'CD3D').
-            top_n: Number of top tissues to include.
-
-        Returns:
-            Dictionary with gene info and ranked tissue expression.
         """
-        # Step 1: Get gene metadata
+        # Retrieve gene metadata.
         gene_info = self.get_gene_info(gene_symbol)
 
         if not gene_info:
             return None
 
-        # Step 2: Get tissue expression
+        # Retrieve tissue expression using Ensembl ID.
         ensembl_id = gene_info.get("id")
         expression_data = self.get_tissue_expression(ensembl_id)
 
-        # Step 3: Rank tissues
+        # Rank tissues by expression level.
         ranked_tissues = self.rank_tissues_by_expression(
             expression_data or [],
             top_n=top_n
@@ -178,15 +149,19 @@ class GeneService:
                 writer.writerow(row)
 
     def close(self) -> None:
-        """Close all connector sessions."""
+        """
+        Close any active connector sessions.
+        """
         if self._ensembl:
             self._ensembl.close()
         if self._hpa:
             self._hpa.close()
 
     def __enter__(self):
+        """Enable use as a context manager."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """Ensure connectors are closed when exiting context."""
         self.close()
         return False
