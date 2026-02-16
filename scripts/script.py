@@ -33,7 +33,7 @@ def main(GENE_SYMBOL: str):
     # Using GeneService as a context manager so that any sessions are properly opened and closed automatically.
     with GeneService() as service:
         # Retrieves core gene metadata from Ensembl.
-        print(f"🔍 Looking up gene: {GENE_SYMBOL}")
+        print(f" Looking up gene: {GENE_SYMBOL}")
         gene_info = service.get_gene_info(GENE_SYMBOL)
 
         # If no data returned from Ensembl for the gene, stops the program.
@@ -75,5 +75,5 @@ def main(GENE_SYMBOL: str):
 Script entry point, prevents automatic execution if this file imported as a module.
 """
 if __name__ == "__main__":
-    GENE_SYMBOL = "EGFR" # Default gene used for testing.
+    GENE_SYMBOL = "CD3D"
     main(GENE_SYMBOL)
