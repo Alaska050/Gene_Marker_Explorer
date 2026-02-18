@@ -10,7 +10,7 @@ Given a human gene symbol, the tool returns:
 - Gene description  
 - Chromosomal location  
 - Strand orientation  
-- Tissue level RNA expression values  
+- Baseline Tissue level RNA expression values  
 
 This project demonstrates API integration, clean architecture, and automated testing combined to build a reliable and structured bioinformatics application..
 
@@ -52,9 +52,7 @@ python cli.py EGFR
 
 Output:
 
-============================================================
-  GeneMarker Explorer
-============================================================
+GeneMarker Explorer
 
  Looking up gene: EGFR
 
@@ -73,9 +71,8 @@ Output:
    Description:     Epidermal growth factor receptor
    Tissue Expression:    [TissueExpression(tissue='placenta', ntpm=61.8)]
 
-============================================================
   Done!
-============================================================
+
 
 
 The application:

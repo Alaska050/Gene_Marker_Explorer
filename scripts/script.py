@@ -75,5 +75,5 @@ def main(GENE_SYMBOL: str):
 Script entry point, prevents automatic execution if this file imported as a module.
 """
 if __name__ == "__main__":
-    GENE_SYMBOL = "CD3D"
+    GENE_SYMBOL = "CD3D" # gene symbol used for testing
     main(GENE_SYMBOL)
