@@ -84,8 +84,8 @@ The application:
 
 ## Project Structure 
 
-`gene_marker_explorer/
-    __init__.py
+gene_marker_explorer/
+
 
     connectors/
         __init__.py
