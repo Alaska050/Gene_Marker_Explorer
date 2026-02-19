@@ -74,44 +74,6 @@ GeneMarker Explorer
   Done!
 
 
-
-The application:
-
-- Resolves the gene symbol via Ensembl  
-- Retrieves full gene metadata  
-- Uses the Ensembl ID to query HPA  
-- Displays  genomic and expression information  
-
-## Project Structure 
-
-gene_marker_explorer/
-
-
-    connectors/
-        __init__.py
-        base.py
-        ensembl.py
-        factory.py
-        hpa.py
-
-    scripts/
-        __init__.py
-        script.py
-
-    services/
-        __init__.py
-        gene_service.py
-
-    tests/
-        __init__.py
-        tests.py
-
-    .gitignore
-     __init__.py
-    cli.py 
-    README.md
-    requirements.txt
-
 ## Scope and Extensibility
 
 The application integrates the Ensembl REST API and the Human Protein Atlas to retrieve genomic metadata and tissue level expression data via a unified CLI workflow.
