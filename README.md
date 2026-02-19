@@ -78,3 +78,10 @@ GeneMarker Explorer
 
 The application integrates the Ensembl REST API and the Human Protein Atlas to retrieve genomic metadata and tissue level expression data via a unified CLI workflow.
 It is designed for extensibility using a reusable BaseConnector and Factory pattern, allowing additional databases to be added with minimal changes to the overall architecture.
+
+## Version Control 
+
+This project was developed using Git for version control. The submitted archive includes the `.git` directory to provide full commit history.
+
+The source codeis also on GitHub:
+https://github.com/Alaska050/Gene_Marker_Explorer.git
